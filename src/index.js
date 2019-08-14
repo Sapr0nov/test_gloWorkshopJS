@@ -27,25 +27,65 @@ const   cards = document.querySelectorAll('.goods .card'),
         cartWrapper = document.querySelector('.cart-wrapper'),
         cartEmpty = document.querySelector('#cart-empty'),
         countGoods = document.querySelector('.counter');
+
 cards.forEach( (card)=> {
     const btn = card.querySelector('button');
     btn.addEventListener('click', ()=> {
+        function isLargeNumber(element) {
+            return element > 13;
+          }
         const   cardClone = card.cloneNode(true),
                 cardCloneBtn = cardClone.querySelector('.btn');
-        cartWrapper.appendChild(cardClone);
-        cardCloneBtn.textContent = 'удалить';
-        cardCloneBtn.addEventListener('click', ()=> {
-            cardClone.remove();
+// TEST
+        const   goodsNum = document.createElement("div");
+        goodsNum.style.width = "30px";
+        goodsNum.style.height = "30px";
+        goodsNum.style.background = "#333333";
+        goodsNum.style.color = "white";
+        goodsNum.innerHTML = "1";
+        goodsNum.style.textAlign = "center";
+        goodsNum.style.position = "absolute";
+        goodsNum.className = "number-sticker";
+// First goods        
+        if (cartWrapper.querySelectorAll('.card').length===0) 
+        {
+            cartWrapper.appendChild(cardClone);
+            cardCloneBtn.textContent = 'удалить';
+            cardCloneBtn.addEventListener('click', ()=> {
+                cardClone.remove();
+                showData();
+                totalText.textContent = calcTotal(modalCart);
+            });
             showData();
-            totalText.textContent = calcTotal(modalCart);
+        }
+// Second and next goods
+        cartWrapper.querySelectorAll('.card').forEach(function(element) {
+            if (element.querySelector('.card-title').textContent === cardClone.querySelector('.card-title').textContent) 
+            // TODO СВЕРЯЕТСЯ С КАЖДЫМ ЭЛЕМЕНТОМ И ВЫПОЛНЯЕТ ДЕЙСТВИЕ А НУЖНО ОДНО ДЕЙСТВИЕ НА ПРОХОД МАССИВА. ДОП ПЕРЕМЕННАЯ?
+                {
+                    console.log(element.querySelector('.card-title').textContent + ' == ' + cardClone.querySelector('.card-title').textContent)
+                    if (element.querySelector('.number-sticker')) {
+                        console.log(element.querySelector('.number-sticker'))
+                        element.querySelector('.number-sticker').textContent = parseFloat(element.querySelector('.number-sticker').textContent) + 1;
+                    }else{
+                        element.appendChild(goodsNum);
+                    }
+                }else{
+                    cartWrapper.appendChild(cardClone);
+                    cardCloneBtn.textContent = 'удалить';
+                    cardCloneBtn.addEventListener('click', ()=> {
+                        cardClone.remove();
+                        showData();
+                        totalText.textContent = calcTotal(modalCart);
+                    });
+                }
+                showData();
         });
-        showData();
     })
 });
 function showData() {
     const cardsCart = cartWrapper.querySelectorAll('.card');
-//    countGoods.textContent = cardsCart.length;    // show total number of goods in Cart
-    countGoods.textContent = calcTotal(modalCart);  // show total cost of goods in Cart
+    countGoods.textContent = cardsCart.length;
     (cardsCart.length) ? cartEmpty.remove() : cartWrapper.appendChild(cartEmpty);
 }
 // end block add/delete stuff to cart
@@ -54,8 +94,8 @@ function calcTotal(cart) {
     const   goodsPrice = cart.querySelectorAll('.card-price');
     var     sum = 0;
         goodsPrice.forEach(function(val){
-            sum += parseInt(val.textContent);
+            sum += parseFloat(val.textContent);
         })
-    return (parseInt(sum).toFixed(0)).toString().replace(/(\d)(?=(\d{3})+($|\.))/g, '$1 ');
+    return (parseFloat(sum).toFixed(0)).toString().replace(/(\d)(?=(\d{3})+($|\.))/g, '$1 ');
 }
 // end function calculate Total in Cart

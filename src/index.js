@@ -10,10 +10,12 @@ checkbox.forEach(function(element) {
 // block cart
 const   cartBtn = document.querySelector('#cart'),
         closeBtn = document.querySelector('.cart-close'),
-        modalCart = document.querySelector('.cart');
+        modalCart = document.querySelector('.cart'),
+        totalText = document.querySelector('.cart-total > span');
 cartBtn.addEventListener('click', ()=> {
     modalCart.style.display = "block";
     document.body.style.overflow = "hidden";
+    totalText.textContent = calcTotal(modalCart);
 });
 closeBtn.addEventListener('click', ()=> {
     modalCart.style.display = "none";
@@ -35,13 +37,25 @@ cards.forEach( (card)=> {
         cardCloneBtn.addEventListener('click', ()=> {
             cardClone.remove();
             showData();
+            totalText.textContent = calcTotal(modalCart);
         });
         showData();
     })
 });
 function showData() {
     const cardsCart = cartWrapper.querySelectorAll('.card');
-    countGoods.textContent = cardsCart.length;
+//    countGoods.textContent = cardsCart.length;    // show total number of goods in Cart
+    countGoods.textContent = calcTotal(modalCart);  // show total cost of goods in Cart
     (cardsCart.length) ? cartEmpty.remove() : cartWrapper.appendChild(cartEmpty);
 }
 // end block add/delete stuff to cart
+// function calculate Total in Cart
+function calcTotal(cart) {
+    const   goodsPrice = cart.querySelectorAll('.card-price');
+    var     sum = 0;
+        goodsPrice.forEach(function(val){
+            sum += parseInt(val.textContent);
+        })
+    return (parseInt(sum).toFixed(0)).toString().replace(/(\d)(?=(\d{3})+($|\.))/g, '$1 ');
+}
+// end function calculate Total in Cart

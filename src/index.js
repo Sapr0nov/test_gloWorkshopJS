@@ -1,5 +1,5 @@
 'use strict';
-//block checkbox
+//block checkbox turn on/ turn off flag on divs of checkboxes
 function toggleCheckbox(){
     const checkbox = document.querySelectorAll('.filter-check_checkbox');
     checkbox.forEach(function(element) {
@@ -10,7 +10,7 @@ function toggleCheckbox(){
     })
 }
 //end block checkbox
-// block cart
+// block cart  add EventListener on page
 function toggleCartInit() {
     const   cartBtn = document.querySelector('#cart'),
             closeBtn = document.querySelector('.cart-close'),
@@ -49,7 +49,7 @@ function toggleCart() {
     const btn = card.querySelector('button');
     btn.addEventListener('click', ()=> {
         const   cardClone = card.cloneNode(true);
-    // GROUP GOOODS
+    // GROUP GOOODS add small div with number of goods one kind
         const   goodsNum = document.createElement("div");
         goodsNum.style.width = "30px";
         goodsNum.style.height = "30px";
@@ -60,14 +60,14 @@ function toggleCart() {
         goodsNum.style.position = "absolute";
         goodsNum.className = "number-sticker";
         goodsNum.style.zIndex = "111";
-        // First goods        
+        // First goods   If no any goods in cart - add to cart
         if (cartWrapper.querySelectorAll('.card').length===0) 
         { 
             addCardCart(cartWrapper,cardClone,goodsNum);
         }else{
-        // Second and next goods
+        // Second and next goods. If any goods are in the cart, match them and added
         let cardsCart = cartWrapper.querySelectorAll('.card');
-        let cardFinded = false;
+        let cardFinded = false; // if one of goods in cart = current flag cardFinded = true. And increment number of that kind goods.
         cardsCart.forEach(function(card) {
             if (card.querySelector('.card-title').textContent === cardClone.querySelector('.card-title').textContent) 
             {
@@ -75,40 +75,42 @@ function toggleCart() {
                 card.querySelector('.number-sticker').textContent = parseFloat(card.querySelector('.number-sticker').textContent) + 1;
             }
         });
-        if (!cardFinded) { addCardCart(cartWrapper,cardClone,goodsNum); }
+        if (!cardFinded) { addCardCart(cartWrapper,cardClone,goodsNum); } // if no any some good, add new
         }
-        showData(cartWrapper);
+        showData(cartWrapper); // update info stickers
     })
     });
 }
 
 /* helpful functions */
+// add goods to cart as new card or as increment current card
 function addCardCart(cartWrapper,cardClone,goodsNum) {
     {
         const   modalCart = document.querySelector('.cart'),
                 cardCloneBtn = cardClone.querySelector('.btn');
         cardClone.appendChild(goodsNum);
         cartWrapper.appendChild(cardClone);
-        cardCloneBtn.textContent = 'удалить';
+        cardCloneBtn.textContent = 'удалить'; // config added card
+        // add function of remove (increment counter or remove card)
         cardCloneBtn.addEventListener('click', function() {
            (parseFloat(this.parentElement.parentElement.querySelector('.number-sticker').textContent)>1) ?                
            this.parentElement.parentElement.querySelector('.number-sticker').textContent = parseFloat(this.parentElement.parentElement.querySelector('.number-sticker').textContent) - 1
            : cardClone.remove();
-            calcTotal(modalCart);
-            showData(cartWrapper);
+            calcTotal(modalCart); // update total
+            showData(cartWrapper);// update informers
         });
     }
 }
+// show informer about quantity of goods
 function showData(cartWrapper) {
     const   cartEmpty = document.querySelector('#cart-empty'),
-            cardsCart = cartWrapper.querySelectorAll('.card'), 
-            cardsCartNum = cartWrapper.querySelectorAll('.number-sticker'), 
-            countGoods = document.querySelector('.counter');
+            numberCardsCart = cartWrapper.querySelectorAll('.card').length, // lenght = number of card in cart
+            cardsCart = cartWrapper.querySelectorAll('.number-sticker'), // array of divs with numbers sticker 
+            countGoods = document.querySelector('.counter'); // sticker with Total Numbers
     let counter = 0;
-    cardsCartNum.forEach((card) => { counter +=  parseFloat(card.textContent); })
-    countGoods.textContent = cardsCart.length + ' [' + counter + ']';
-    (counter) ? cartEmpty.style.display="none" : cartEmpty.style.display="block";
-
+    cardsCart.forEach((card) => { counter +=  parseFloat(card.textContent); })  // sum all divs with numbers
+    countGoods.textContent = numberCardsCart + ' [' + counter + ']';
+    (counter) ? cartEmpty.style.display="none" : cartEmpty.style.display="block"; 
 }
 // end block add/delete stuff to cart
 // function calculate Total in Cart
@@ -117,10 +119,10 @@ function calcTotal(cart) {
             totalText = document.querySelector('.cart-total > span');
     var     sum = 0;
     cards.forEach(function(card) {
-        const   goodPrice = parseFloat(card.querySelector('.card-price').textContent),
-                goodNumber = parseFloat(card.querySelector('.number-sticker').textContent);
-                sum += goodPrice * goodNumber;
-    })
+        const   goodPrice = parseFloat(card.querySelector('.card-price').textContent), // get Price in card
+                goodNumber = parseFloat(card.querySelector('.number-sticker').textContent); // get Number in card
+                sum += goodPrice * goodNumber; 
+    }) // add Space after each three simbol of cost. Example "33 500", "12 325 524" 
     totalText.textContent = (parseFloat(sum).toFixed(0)).toString().replace(/(\d)(?=(\d{3})+($|\.))/g, '$1 ');
 }
 // end function calculate Total in Cart
@@ -134,9 +136,9 @@ function filters() {
             maxPrice = document.querySelector('#max'),
             search = document.querySelector('.search-wrapper_input'),
             searchText = new RegExp(search.value.trim(), 'i');
-
+    // do all card visible
     cards.forEach((card)=> {card.parentElement.style.display = "block";});
-
+    // hide card under the filters
     cards.forEach((card)=> {
         if (discountCheckbox.checked) {
             if (!card.querySelector('.card-sale')) {
@@ -166,6 +168,7 @@ function filters() {
     });
 }
 // end block filters
+// start function 
 toggleCartInit();
-toggleCart();
 toggleCheckbox();
+toggleCart();

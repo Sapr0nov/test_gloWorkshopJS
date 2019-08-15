@@ -38,7 +38,7 @@ function toggleCartInit() {
     minPrice.addEventListener('change', filters);
     search.addEventListener('change', filters);
     searchBtn.addEventListener('change', filters);
-    search.addEventListener('keypress',filters);
+    search.addEventListener('keyup',filters);
     }
 // end block cart
 // block add/delete stuff to cart

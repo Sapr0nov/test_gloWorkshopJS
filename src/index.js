@@ -100,11 +100,15 @@ function addCardCart(cartWrapper,cardClone,goodsNum) {
     }
 }
 function showData(cartWrapper) {
-    const   cardsCart = cartWrapper.querySelectorAll('.card'),
-            countGoods = document.querySelector('.counter'),
-            cartEmpty = document.querySelector('#cart-empty');
-    countGoods.textContent = cardsCart.length;
-    (cardsCart.length) ? cartEmpty.style.display="none" : cartEmpty.style.display="block";
+    const   cartEmpty = document.querySelector('#cart-empty'),
+            cardsCart = cartWrapper.querySelectorAll('.card'), 
+            cardsCartNum = cartWrapper.querySelectorAll('.number-sticker'), 
+            countGoods = document.querySelector('.counter');
+    let counter = 0;
+    cardsCartNum.forEach((card) => { counter +=  parseFloat(card.textContent); })
+    countGoods.textContent = cardsCart.length + ' [' + counter + ']';
+    (counter) ? cartEmpty.style.display="none" : cartEmpty.style.display="block";
+
 }
 // end block add/delete stuff to cart
 // function calculate Total in Cart

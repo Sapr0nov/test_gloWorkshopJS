@@ -168,7 +168,53 @@ function filters() {
     });
 }
 // end block filters
-// start function 
+// function getData
+function getData() {
+    const goodsWrapper = document.querySelector('.gooods');
+    fetch('../db/db.json')
+    .then((response) => {
+        if (response.ok) 
+        {
+            return response.json();
+        }else{
+            throw new Error ('Error, data not resive: ' + response.status);
+        }  
+    })
+    .then(data => renderCards(data))
+    .catch(err => {
+        goodsWrapper.innerHTML = '<div style="color: red;">Ошибка: не удалось получить данные!</div>';
+        console.warn('Error, data not resive: ' + err)
+    });
+}
+// end getData
+// render
+function renderCards(cards) {
+    const   {goods} = cards,
+            goodsWrapper = document.querySelector('.goods');
+        goods.map(card => {
+//        card.category; card.hoverImg; card.title; card.price; card.sale; card.img;
+        const   cardHtml = document.createElement('div');
+        cardHtml.className = 'col-12 col-md-6 col-lg-4 col-xl-3';
+        cardHtml.innerHTML = `
+        <div class="card">
+            ${card.sale ? '<div class="card-sale">🔥Hot Sale🔥</div>' : ''}
+            <div class="card-img-wrapper">
+                <span class="card-img-top"
+                    style="background-image: url('${card.img}')"></span>
+            </div>
+            <div class="card-body justify-content-between">
+                <div class="card-price" style="${card.sale ? 'color: green;' : ''}">${card.price} ₽</div>
+                <h5 class="card-title">${card.title}</h5>
+                <button class="btn btn-primary">В корзину</button>
+            </div>
+        </div>
+        `;
+        goodsWrapper.appendChild(cardHtml);
+    })
+}
+// end render
+// start functions
+getData();
 toggleCartInit();
 toggleCheckbox();
 toggleCart();

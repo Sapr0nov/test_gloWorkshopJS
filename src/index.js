@@ -1,7 +1,7 @@
 'use strict';
 //block checkbox turn on/ turn off flag on divs of checkboxes
 function toggleCheckbox(){
-    const checkbox = document.querySelectorAll('.filter-check_checkbox');
+    const checkbox = document.querySelectorAll('.filter-check-checkbox');
     checkbox.forEach(function(element) {
         element.addEventListener('change', ()=> {
             (element.checked) ? element.nextElementSibling.classList.add('checked') : element.nextElementSibling.classList.remove('checked');
@@ -17,7 +17,7 @@ function toggleCartInit() {
             modalCart = document.querySelector('.cart'),
             minPrice = document.querySelector('#min'),
             maxPrice = document.querySelector('#max'),
-            search = document.querySelector('.search-wrapper_input'),
+            search = document.querySelector('.search-wrapper-input'),
             searchBtn = document.querySelector('.search-btn');
     document.addEventListener('click', (event)=> {
         if (event.target.className === 'cart') {
@@ -134,11 +134,12 @@ function filters() {
             topCheckbox = document.querySelector('#discount-top'),
             minPrice = document.querySelector('#min'),
             maxPrice = document.querySelector('#max'),
-            search = document.querySelector('.search-wrapper_input'),
+            search = document.querySelector('.search-wrapper-input'),
             searchText = new RegExp(search.value.trim(), 'i');
     // do all card visible
     cards.forEach((card)=> {card.parentElement.style.display = "block";});
     // hide card under the filters
+
     cards.forEach((card)=> {
         if (discountCheckbox.checked) {
             if (!card.querySelector('.card-sale')) {
@@ -165,13 +166,18 @@ function filters() {
         if (! searchText.test(card.querySelector('.card-title').textContent)) {
             card.parentElement.style.display = "none";
         }
+         if (document.querySelector('.catalog-list > .active') && (document.querySelector('.catalog-list > .active')!==document.querySelector('.catalog-list > li:first-child')) ) {
+            if (card.dataset.category !== document.querySelector('.catalog-list > .active').textContent) {
+                card.parentElement.style.display = 'none';         
+            }
+    }
     });
 }
 // end block filters
 // function getData
 function getData() {
     const goodsWrapper = document.querySelector('.gooods');
-    fetch('../db/db.json')
+    return fetch('../db/db.json')
     .then((response) => {
         if (response.ok) 
         {
@@ -191,13 +197,12 @@ function getData() {
 function renderCards(cards) {
     const   {goods} = cards,
             goodsWrapper = document.querySelector('.goods');
-        goods.map(card => {
-//        card.category; card.hoverImg; card.title; card.price; card.sale; card.img;
+    goods.map(card => {
         const   cardHtml = document.createElement('div');
         cardHtml.className = 'col-12 col-md-6 col-lg-4 col-xl-3';
         cardHtml.innerHTML = `
-        <div class="card">
-            ${card.sale ? '<div class="card-sale">🔥Hot Sale🔥</div>' : ''}
+        <div class="card" data-category="${card.category}">
+            ${card.sale ? '<div class="card-sale"> Hot Sale🔥</div>' : ''}
             <div class="card-img-wrapper">
                 <span class="card-img-top"
                     style="background-image: url('${card.img}')"></span>
@@ -212,9 +217,40 @@ function renderCards(cards) {
         goodsWrapper.appendChild(cardHtml);
     })
 }
+
+function renderCatalog(){
+    const   cards = document.querySelectorAll('.goods .card'),
+            catalogList = document.querySelector('.catalog-list'),
+            catalogWrapper = document.querySelector('.catalog'),
+            catalogBtn = document.querySelector('.catalog-button');
+    let     categories = new Set();
+            // get all categories in cards
+            categories.add('Все');
+            cards.forEach(card => {
+                categories.add(card.dataset.category);
+            });
+            // form menu list
+            categories.forEach(item => {
+                const li = document.createElement('li');
+                li.textContent = item;
+                catalogList.appendChild(li);
+            });
+    catalogBtn.addEventListener('click',()=> {
+        (catalogWrapper.style.display=='none') ? catalogWrapper.style.display = 'block' : catalogWrapper.style.display = 'none';
+        if (event && event.target.tagName == 'LI') {
+            // remove class for all li element and add "active" class for choose element
+            document.querySelectorAll('.catalog-list li').forEach(element => element.className = '' );
+            event.target.className = "active"; 
+        } 
+        filters();
+    })
+}
 // end render
+
 // start functions
-getData();
-toggleCartInit();
-toggleCheckbox();
-toggleCart();
+getData().then(data => {
+    renderCatalog();
+    toggleCartInit();
+    toggleCheckbox();
+    toggleCart();
+});
